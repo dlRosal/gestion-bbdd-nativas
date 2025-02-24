@@ -12,7 +12,9 @@ public class ConsolaVista {
             System.out.println("\n📚 GESTIÓN DE BIBLIOTECA 📚");
             System.out.println("1. Agregar Libro");
             System.out.println("2. Listar Libros");
-            System.out.println("3. Salir");
+            System.out.println("3. Modificar Libro");
+            System.out.println("4. Eliminar Libro");
+            System.out.println("5. Salir");
             System.out.print("Elige una opción: ");
 
             int opcion = scanner.nextInt();
@@ -26,6 +28,12 @@ public class ConsolaVista {
                     controlador.listarLibros();
                     break;
                 case 3:
+                    controlador.modificarLibro();
+                    break;
+                case 4:
+                    controlador.eliminarLibro();
+                    break;
+                case 5:
                     System.out.println("Saliendo...");
                     return;
                 default:

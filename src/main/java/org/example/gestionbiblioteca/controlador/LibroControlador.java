@@ -28,4 +28,31 @@ public class LibroControlador {
     public void listarLibros() {
         libroService.obtenerLibros();
     }
+    public void modificarLibro() {
+        System.out.print("Ingrese el ID del libro a modificar: ");
+        String id = scanner.nextLine();
+
+        System.out.print("Nuevo título: ");
+        String nuevoTitulo = scanner.nextLine();
+
+        System.out.print("Nuevo autor: ");
+        String nuevoAutor = scanner.nextLine();
+
+        System.out.print("Nuevo género: ");
+        String nuevoGenero = scanner.nextLine();
+
+        System.out.print("Nuevo año: ");
+        int nuevoAnio = scanner.nextInt();
+        scanner.nextLine();
+
+        libroService.modificarLibro(id, nuevoTitulo, nuevoAutor, nuevoGenero, nuevoAnio);
+    }
+
+    public void eliminarLibro() {
+        System.out.print("Ingrese el ID del libro a eliminar: ");
+        String id = scanner.nextLine();
+
+        libroService.eliminarLibro(id);
+    }
+
 }

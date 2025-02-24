@@ -15,5 +15,9 @@ public class Libro {
         this.anio = anio;
     }
 
-    // Getters y setters
+    public String getId() { return id; }
+    public String getTitulo() { return titulo; }
+    public String getAutor() { return autor; }
+    public String getGenero() { return genero; }
+    public int getAnio() { return anio; }
 }
