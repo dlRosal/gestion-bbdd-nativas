@@ -2,7 +2,7 @@ package org.example.gestionbiblioteca.servicio;
 
 import org.example.gestionbiblioteca.modelo.BaseXConnection;
 import org.example.gestionbiblioteca.modelo.Libro;
-import org.basex.core.cmd.*;
+import org.basex.api.client.ClientSession;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,55 +10,76 @@ import java.util.List;
 public class LibroService {
 
     // Método para agregar un libro
-    public void agregarLibro(Libro libro) {
+    public void agregarLibro(String titulo, String autor, String genero, int anio) {
         try {
-            String xquery = "insert node <libro id='" + libro.getId() + "'>" +
-                    "<titulo>" + libro.getTitulo() + "</titulo>" +
-                    "<autor>" + libro.getAutor() + "</autor>" +
-                    "<genero>" + libro.getGenero() + "</genero>" +
-                    "<anio>" + libro.getAnio() + "</anio>" +
-                    "</libro> into //biblioteca";
-            new XQuery(xquery).execute(BaseXConnection.getContext());
-            System.out.println("Libro agregado correctamente.");
+            ClientSession session = BaseXConnection.getSession();
+
+            // Obtener el ID más alto de la base de datos
+            String xqueryMaxId = "let $max := max((/biblioteca/libro/@id)) return if ($max) then $max else 0";
+            String resultadoMaxId = session.execute("XQUERY " + xqueryMaxId);
+
+            // Convertir el resultado en un número y calcular el nuevo ID
+            int nuevoId = Integer.parseInt(resultadoMaxId.trim()) + 1;
+
+            // Insertar el nuevo libro con el ID autoincrementado
+            String xqueryInsert = "insert node <libro id='" + nuevoId + "'>" +
+                    "<titulo>" + titulo + "</titulo>" +
+                    "<autor>" + autor + "</autor>" +
+                    "<genero>" + genero + "</genero>" +
+                    "<anio>" + anio + "</anio>" +
+                    "</libro> into /biblioteca";
+
+            session.execute("XQUERY " + xqueryInsert);
+            System.out.println("✅ Libro agregado correctamente con ID: " + nuevoId);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
+    // Método para obtener todos los libros
     public List<Libro> obtenerLibros() {
         List<Libro> listaLibros = new ArrayList<>();
         try {
-            // Usamos db:get() para asegurarnos de que estamos consultando la base de datos correcta
+            ClientSession session = BaseXConnection.getSession();
             String xquery = "for $libro in db:get('Biblioteca')//libro " +
-                    "return concat($libro/@id, ',', $libro/titulo, ',', $libro/autor, ',', $libro/genero, ',', $libro/anio)";
+                    "return concat($libro/@id, '|', $libro/titulo, '|', $libro/autor, '|', $libro/genero, '|', $libro/anio)";
 
-            String resultado = new XQuery(xquery).execute(BaseXConnection.getContext());
+            String resultado = session.execute("XQUERY " + xquery);
 
             if (resultado.isEmpty()) {
-                System.out.println("No hay libros en la base de datos.");
-                return listaLibros;
+                return listaLibros; // No imprimimos aquí, solo devolvemos la lista vacía
             }
 
-            // Procesamos el resultado para convertirlo en objetos Libro
             String[] librosArray = resultado.split("\n");
             for (String libroCSV : librosArray) {
                 if (!libroCSV.trim().isEmpty()) {
-                    String[] datos = libroCSV.split(",");
-                    listaLibros.add(new Libro(datos[0], datos[1], datos[2], datos[3], Integer.parseInt(datos[4])));
+                    String[] datos = libroCSV.split("\\|");
+
+                    if (datos.length == 5) {
+                        try {
+                            int anio = Integer.parseInt(datos[4].trim());
+                            listaLibros.add(new Libro(datos[0], datos[1], datos[2], datos[3], anio));
+                        } catch (NumberFormatException e) {
+                            System.out.println("⚠️ Error al convertir el año para el libro: " + datos[1]);
+                        }
+                    }
                 }
             }
-
-            System.out.println("Libros obtenidos correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
         }
         return listaLibros;
     }
 
+
+
+    // Método para modificar un libro
     public void modificarLibro(String id, String nuevoTitulo, String nuevoAutor, String nuevoGenero, int nuevoAnio) {
         try {
+            ClientSession session = BaseXConnection.getSession();
             String xquery =
-                    "let $libro := //libro[@id='" + id + "'] " +
+                    "let $libro := /biblioteca/libro[@id='" + id + "'] " +
                             "return (" +
                             "replace value of node $libro/titulo with '" + nuevoTitulo + "'," +
                             "replace value of node $libro/autor with '" + nuevoAutor + "'," +
@@ -66,21 +87,24 @@ public class LibroService {
                             "replace value of node $libro/anio with '" + nuevoAnio + "'" +
                             ")";
 
-            new XQuery(xquery).execute(BaseXConnection.getContext());
-            System.out.println("Libro con ID " + id + " modificado correctamente.");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public void eliminarLibro(String id) {
-        try {
-            String xquery = "delete node //libro[@id='" + id + "']";
-            new XQuery(xquery).execute(BaseXConnection.getContext());
-            System.out.println("Libro con ID " + id + " eliminado correctamente.");
+            session.execute("XQUERY " + xquery);
+            System.out.println("✅ Libro con ID " + id + " modificado correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // Método para eliminar un libro
+    public void eliminarLibro(String id) {
+        try {
+            ClientSession session = BaseXConnection.getSession();
+            String xquery = "delete node /biblioteca/libro[@id='" + id + "']";
+
+            session.execute("XQUERY " + xquery);
+            System.out.println("✅ Libro con ID " + id + " eliminado correctamente.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

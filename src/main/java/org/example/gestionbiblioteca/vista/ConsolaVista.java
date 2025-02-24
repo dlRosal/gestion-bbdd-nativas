@@ -17,8 +17,13 @@ public class ConsolaVista {
             System.out.println("5. Salir");
             System.out.print("Elige una opción: ");
 
-            int opcion = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
+            int opcion;
+            try {
+                opcion = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Entrada inválida. Ingresa un número.");
+                continue;
+            }
 
             switch (opcion) {
                 case 1:
@@ -34,10 +39,10 @@ public class ConsolaVista {
                     controlador.eliminarLibro();
                     break;
                 case 5:
-                    System.out.println("Saliendo...");
+                    System.out.println("👋 Saliendo de la aplicación...");
                     return;
                 default:
-                    System.out.println("Opción inválida.");
+                    System.out.println("❌ Opción inválida. Intenta de nuevo.");
             }
         }
     }

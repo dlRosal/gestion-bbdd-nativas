@@ -1,36 +1,29 @@
 package org.example.gestionbiblioteca.modelo;
 
-import org.basex.core.*;
-import org.basex.core.cmd.*;
+import org.basex.api.client.ClientSession;
 
 public class BaseXConnection {
-    private static final Context context = new Context();
-    private static final String DATABASE_NAME = "Biblioteca";
+    private static ClientSession session;
 
     static {
         try {
-            // Intentamos abrir la base de datos
-            new Open(DATABASE_NAME).execute(context);
-            System.out.println("✅ Conectado a la base de datos: " + DATABASE_NAME);
+            // Conectar al servidor BaseX en localhost, puerto 1984, usuario "admin", sin contraseña
+            session = new ClientSession("localhost", 1984, "admin", "admin");
+            session.execute("OPEN Biblioteca"); // Abrir la base de datos
+            System.out.println("✅ Conectado a la base de datos en BaseX Server.");
         } catch (Exception e) {
-            System.out.println("⚠️ No se encontró la base de datos, creándola...");
-            try {
-                new CreateDB(DATABASE_NAME, "<biblioteca/>").execute(context);
-                System.out.println("✅ Base de datos '" + DATABASE_NAME + "' creada correctamente.");
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            System.out.println("⚠️ No se pudo conectar a BaseX Server.");
+            e.printStackTrace();
         }
     }
 
-    public static Context getContext() {
-        return context;
+    public static ClientSession getSession() {
+        return session;
     }
 
     public static void cerrarConexion() {
         try {
-            new Close().execute(context);
-            context.close();
+            session.close();
             System.out.println("✅ Conexión con BaseX cerrada.");
         } catch (Exception e) {
             e.printStackTrace();
