@@ -4,18 +4,23 @@ import org.example.gestionbiblioteca.controlador.LibroControlador;
 import java.util.Scanner;
 
 public class ConsolaVista {
-    private static Scanner scanner = new Scanner(System.in);
-    private static LibroControlador controlador = new LibroControlador();
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final LibroControlador controlador = new LibroControlador();
 
     public static void mostrarMenu() {
         while (true) {
-            System.out.println("\n📚 GESTIÓN DE BIBLIOTECA 📚");
-            System.out.println("1. Agregar Libro");
-            System.out.println("2. Listar Libros");
-            System.out.println("3. Modificar Libro");
-            System.out.println("4. Eliminar Libro");
-            System.out.println("5. Salir");
-            System.out.print("Elige una opción: ");
+            System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            System.out.println("          📚 GESTIÓN DE BIBLIOTECA 📚          ");
+            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            System.out.println(" 1️⃣  ➤ Agregar Libro");
+            System.out.println(" 2️⃣  ➤ Listar Libros");
+            System.out.println(" 3️⃣  ➤ Modificar un Libro");
+            System.out.println(" 4️⃣  ➤ Eliminar un Libro");
+            System.out.println(" 5️⃣  ➤ Crear Colección");
+            System.out.println(" 6️⃣  ➤ Eliminar Colección");
+            System.out.println(" 7️⃣  🔴 Salir");
+            System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            System.out.print(" 📝 Selecciona una opción: ");
 
             int opcion;
             try {
@@ -39,7 +44,13 @@ public class ConsolaVista {
                     controlador.eliminarLibro();
                     break;
                 case 5:
-                    System.out.println("👋 Saliendo de la aplicación...");
+                    controlador.crearColeccion();
+                    break;
+                case 6:
+                    controlador.eliminarColeccion();
+                    break;
+                case 7:
+                    System.out.println("\n👋 ¡Gracias por usar la Biblioteca! Hasta pronto.");
                     return;
                 default:
                     System.out.println("❌ Opción inválida. Intenta de nuevo.");

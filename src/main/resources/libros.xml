@@ -1,63 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <biblioteca>
-    <libro id="1">
-        <titulo>Cien años de soledad</titulo>
-        <autor>Gabriel García Márquez</autor>
-        <genero>Realismo mágico</genero>
-        <anio>1967</anio>
-    </libro>
-    <libro id="2">
-        <titulo>1984</titulo>
-        <autor>George Orwell</autor>
-        <genero>Ciencia ficción</genero>
-        <anio>1949</anio>
-    </libro>
-    <libro id="3">
-        <titulo>Don Quijote de la Mancha</titulo>
-        <autor>Miguel de Cervantes</autor>
-        <genero>Clásico</genero>
-        <anio>1605</anio>
-    </libro>
-    <libro id="4">
-        <titulo>El principito</titulo>
-        <autor>Antoine de Saint-Exupéry</autor>
-        <genero>Fábula</genero>
-        <anio>1943</anio>
-    </libro>
-    <libro id="5">
-        <titulo>Crimen y castigo</titulo>
-        <autor>Fiódor Dostoyevski</autor>
-        <genero>Filosofía</genero>
-        <anio>1866</anio>
-    </libro>
-    <libro id="6">
-        <titulo>Los juegos del hambre</titulo>
-        <autor>Suzanne Collins</autor>
-        <genero>Distopía</genero>
-        <anio>2008</anio>
-    </libro>
-    <libro id="7">
-        <titulo>El código Da Vinci</titulo>
-        <autor>Dan Brown</autor>
-        <genero>Misterio</genero>
-        <anio>2003</anio>
-    </libro>
-    <libro id="8">
-        <titulo>Orgullo y prejuicio</titulo>
-        <autor>Jane Austen</autor>
-        <genero>Romance</genero>
-        <anio>1813</anio>
-    </libro>
-    <libro id="9">
-        <titulo>La sombra del viento</titulo>
-        <autor>Carlos Ruiz Zafón</autor>
-        <genero>Misterio</genero>
-        <anio>2001</anio>
-    </libro>
-    <libro id="10">
-        <titulo>El señor de los anillos</titulo>
-        <autor>J.R.R. Tolkien</autor>
-        <genero>Fantasía</genero>
-        <anio>1954</anio>
-    </libro>
+    <coleccion nombre="Ficción">
+        <libro id="1">
+            <titulo>El Hobbit</titulo>
+            <autor>J.R.R. Tolkien</autor>
+            <genero>Fantasía</genero>
+            <anio>1937</anio>
+        </libro>
+        <libro id="2">
+            <titulo>Dune</titulo>
+            <autor>Frank Herbert</autor>
+            <genero>Ciencia Ficción</genero>
+            <anio>1965</anio>
+        </libro>
+    </coleccion>
+
+    <coleccion nombre="Futbol">
+        <libro id="1">
+            <titulo>Real Madrid</titulo>
+            <autor>Floren</autor>
+            <genero>Futbolito</genero>
+            <anio>1945</anio>
+        </libro>
+    </coleccion>
+
+    <coleccion nombre="Historia">
+        <libro id="1">
+            <titulo>Guerra y Paz</titulo>
+            <autor>León Tolstói</autor>
+            <genero>Histórico</genero>
+            <anio>1869</anio>
+        </libro>
+        <libro id="2">
+            <titulo>Los pilares de la Tierra</titulo>
+            <autor>Ken Follett</autor>
+            <genero>Histórico</genero>
+            <anio>1989</anio>
+        </libro>
+    </coleccion>
 </biblioteca>
