@@ -69,14 +69,11 @@ public class LibroControlador {
         }
     }
 
-
-
-
     // ✅ Modificar un libro en una colección
     public void modificarLibro() {
         System.out.print("📂 Ingrese el nombre de la colección: ");
         String nombreColeccion = scanner.nextLine();
-        System.out.print("📖 Ingrese el título del libro a modificar: ");
+        System.out.print("Ingrese el id del libro a modificar: ");
         String tituloAntiguo = scanner.nextLine();
         System.out.print("📖 Nuevo título: ");
         String tituloNuevo = scanner.nextLine();
@@ -90,12 +87,22 @@ public class LibroControlador {
         libroService.modificarLibro(nombreColeccion, tituloAntiguo, tituloNuevo, autorNuevo, generoNuevo, anioNuevo);
     }
 
-    // ✅ Eliminar un libro de una colección
+    // ✅ Eliminar un libro de una colección por ID
     public void eliminarLibro() {
         System.out.print("📂 Ingrese el nombre de la colección: ");
         String nombreColeccion = scanner.nextLine();
-        System.out.print("📖 Ingrese el título del libro a eliminar: ");
-        String titulo = scanner.nextLine();
-        libroService.eliminarLibro(nombreColeccion, titulo);
+        System.out.print("📖 Ingrese el ID del libro a eliminar: ");
+
+        // ✅ Validación para asegurarse de que el usuario ingrese un número
+        int idLibro;
+        try {
+            idLibro = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Error: Debe ingresar un número válido para el ID.");
+            return;
+        }
+
+        libroService.eliminarLibroPorId(nombreColeccion, idLibro);
     }
+
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class LibroService {
 
-    // ✅ Crear una colección dentro de la Biblioteca
+    //  Crear una colección dentro de la Biblioteca
     public void crearColeccion(String nombreColeccion) {
         try {
             ClientSession session = BaseXConnection.getSession();
@@ -25,7 +25,7 @@ public class LibroService {
         }
     }
 
-    // ✅ Eliminar una colección dentro de la Biblioteca
+    //  Eliminar una colección dentro de la Biblioteca
     public void eliminarColeccion(String nombreColeccion) {
         try {
             ClientSession session = BaseXConnection.getSession();
@@ -42,41 +42,42 @@ public class LibroService {
         }
     }
 
-    // ✅ Agregar un libro en una colección
     public void agregarLibro(String nombreColeccion, String titulo, String autor, String genero, int anio) {
         try {
             ClientSession session = BaseXConnection.getSession();
 
-            // Obtener el último ID de los libros dentro de la colección
-            String xqueryMaxId = "let $max := max(collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro/@id) " +
+            //  Obtener el último ID de los libros dentro de la colección para autoincrementar
+            String xqueryMaxId = "let $max := max(for $libro in collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro return number($libro/@id)) " +
                     "return if ($max) then $max else 0";
             String resultadoMaxId = session.execute("XQUERY " + xqueryMaxId).trim();
-
             int nuevoId = resultadoMaxId.matches("\\d+") ? Integer.parseInt(resultadoMaxId) + 1 : 1;
 
-            // Insertar el nuevo libro con ID autoincremental
-            String xqueryInsert = "insert node <libro id='" + nuevoId + "'>" +
-                    "<titulo>" + titulo + "</titulo>" +
-                    "<autor>" + autor + "</autor>" +
-                    "<genero>" + genero + "</genero>" +
-                    "<anio>" + anio + "</anio>" +
-                    "</libro> into collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']";
+            String xqueryInsert = "XQUERY insert node element libro { " +
+                    "attribute id { '" + nuevoId + "' }, " +
+                    "element titulo { '" + titulo + "' }, " +
+                    "element autor { '" + autor + "' }, " +
+                    "element genero { '" + genero + "' }, " +
+                    "element anio { '" + anio + "' } " +
+                    "} into collection('Biblioteca')//coleccion[@nombre=\"" + nombreColeccion + "\"]";
 
-            session.execute("XQUERY " + xqueryInsert);
+
+
+            session.execute(xqueryInsert);
+
+            //  Asegurar la correcta estructura del XML
+            session.execute("OPTIMIZE ALL");
+
             System.out.println("✅ Libro agregado correctamente con ID: " + nuevoId);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
-    // ✅ Obtener libros de una colección
     public List<Libro> obtenerLibros(String nombreColeccion) {
         List<Libro> listaLibros = new ArrayList<>();
         try {
             ClientSession session = BaseXConnection.getSession();
 
-            // ✅ Modificación: aseguramos que el ID y Año se extraigan correctamente
             String xquery = "XQUERY for $libro in collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro " +
                     "return concat(string($libro/@id), '|', string($libro/titulo), '|', " +
                     "string($libro/autor), '|', string($libro/genero), '|', string($libro/anio))";
@@ -84,10 +85,9 @@ public class LibroService {
             String resultado = session.execute(xquery).trim();
 
             if (resultado.isEmpty()) {
-                return listaLibros; // Si no hay libros, devuelve una lista vacía
+                return listaLibros;
             }
 
-            // ✅ Procesar correctamente cada libro
             String[] librosArray = resultado.split("\n");
             for (String libroCSV : librosArray) {
                 if (!libroCSV.trim().isEmpty()) {
@@ -115,36 +115,67 @@ public class LibroService {
         return listaLibros;
     }
 
-
-
-
-
-    // ✅ Modificar un libro en una colección
-    public void modificarLibro(String nombreColeccion, String tituloAntiguo, String tituloNuevo, String autorNuevo, String generoNuevo, int anioNuevo) {
+    public void modificarLibro(String nombreColeccion, String idLibro, String nuevoTitulo, String nuevoAutor, String nuevoGenero, int nuevoAnio) {
         try {
             ClientSession session = BaseXConnection.getSession();
-            String xqueryUpdate = "replace value of node collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro[titulo='" + tituloAntiguo + "'] with <libro>" +
-                    "<titulo>" + tituloNuevo + "</titulo>" +
-                    "<autor>" + autorNuevo + "</autor>" +
-                    "<genero>" + generoNuevo + "</genero>" +
-                    "<anio>" + anioNuevo + "</anio>" +
-                    "</libro>";
-            session.execute("XQUERY " + xqueryUpdate);
-            System.out.println("✅ Libro modificado correctamente en la colección '" + nombreColeccion + "'.");
+
+            String xqueryCheck = "XQUERY exists(collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro[@id='" + idLibro + "'])";
+            String existe = session.execute(xqueryCheck).trim();
+
+            if ("false".equals(existe)) {
+                System.out.println("❌ El libro con ID " + idLibro + " no existe en la colección '" + nombreColeccion + "'.");
+                return;
+            }
+
+            String xqueryUpdateTitulo = "replace value of node collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro[@id='" + idLibro + "']/titulo " +
+                    "with '" + nuevoTitulo + "'";
+            String xqueryUpdateAutor = "replace value of node collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro[@id='" + idLibro + "']/autor " +
+                    "with '" + nuevoAutor + "'";
+            String xqueryUpdateGenero = "replace value of node collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro[@id='" + idLibro + "']/genero " +
+                    "with '" + nuevoGenero + "'";
+            String xqueryUpdateAnio = "replace value of node collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro[@id='" + idLibro + "']/anio " +
+                    "with '" + nuevoAnio + "'";
+
+            session.execute("XQUERY " + xqueryUpdateTitulo);
+            session.execute("XQUERY " + xqueryUpdateAutor);
+            session.execute("XQUERY " + xqueryUpdateGenero);
+            session.execute("XQUERY " + xqueryUpdateAnio);
+
+            session.execute("OPTIMIZE ALL");
+
+            System.out.println("✅ Libro con ID " + idLibro + " modificado correctamente.");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // ✅ Eliminar un libro de una colección
-    public void eliminarLibro(String nombreColeccion, String titulo) {
+    //  Eliminar un libro de una colección
+    public void eliminarLibroPorId(String nombreColeccion, int idLibro) {
         try {
             ClientSession session = BaseXConnection.getSession();
-            String xqueryDelete = "delete node collection('Biblioteca')//coleccion[@nombre='" + nombreColeccion + "']/libro[titulo='" + titulo + "']";
-            session.execute("XQUERY " + xqueryDelete);
-            System.out.println("✅ Libro eliminado correctamente de la colección '" + nombreColeccion + "'.");
+
+            //  Verificar si el libro con ese ID existe antes de intentar eliminarlo
+            String xqueryCheck = "XQUERY count(collection('Biblioteca')//coleccion[@nombre=\"" + nombreColeccion + "\"]/libro[@id='" + idLibro + "'])";
+            String resultadoCheck = session.execute(xqueryCheck).trim();
+
+            if (resultadoCheck.equals("0")) {
+                System.out.println("❌ El libro con ID '" + idLibro + "' no existe en la colección '" + nombreColeccion + "'.");
+                return;
+            }
+
+            //  Eliminar el nodo del libro correctamente usando el ID
+            String xqueryDelete = "XQUERY delete node collection('Biblioteca')//coleccion[@nombre=\"" + nombreColeccion + "\"]/libro[@id='" + idLibro + "']";
+            session.execute(xqueryDelete);
+
+            //  Optimizar la base de datos para evitar problemas con la estructura
+            session.execute("OPTIMIZE ALL");
+
+            System.out.println("✅ Libro con ID '" + idLibro + "' eliminado correctamente de la colección '" + nombreColeccion + "'.");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
 }
