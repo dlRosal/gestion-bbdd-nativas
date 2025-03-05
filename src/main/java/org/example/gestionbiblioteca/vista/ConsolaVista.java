@@ -18,7 +18,10 @@ public class ConsolaVista {
             System.out.println(" 4️⃣  ➤ Eliminar un Libro");
             System.out.println(" 5️⃣  ➤ Crear Colección");
             System.out.println(" 6️⃣  ➤ Eliminar Colección");
-            System.out.println(" 7️⃣  🔴 Salir");
+            System.out.println(" 7️⃣  ➤ Buscar Libro por ID");
+            System.out.println(" 8️⃣  ➤ Buscar Libro por Título");
+            System.out.println(" 9️⃣  ➤ Buscar Libros por Autor");
+            System.out.println(" 🔟  🔴 Salir");
             System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             System.out.print(" 📝 Selecciona una opción: ");
 
@@ -50,6 +53,15 @@ public class ConsolaVista {
                     controlador.eliminarColeccion();
                     break;
                 case 7:
+                    controlador.buscarLibroPorId();
+                    break;
+                case 8:
+                    controlador.buscarLibroPorTitulo();
+                    break;
+                case 9:
+                    controlador.buscarLibrosPorAutor();
+                    break;
+                case 10:
                     System.out.println("\n👋 ¡Gracias por usar la Biblioteca! Hasta pronto.");
                     return;
                 default:

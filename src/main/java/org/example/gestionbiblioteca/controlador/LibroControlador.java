@@ -104,5 +104,44 @@ public class LibroControlador {
 
         libroService.eliminarLibroPorId(nombreColeccion, idLibro);
     }
+    public void buscarLibroPorId() {
+        System.out.print("📂 Ingrese el nombre de la colección: ");
+        String nombreColeccion = scanner.nextLine();
+        System.out.print("🔍 Ingrese el ID del libro: ");
+        int id = scanner.nextInt();
+        scanner.nextLine(); // Consumir la línea
+
+        Libro libro = libroService.buscarLibroPorId(nombreColeccion, id);
+        if (libro != null) {
+            System.out.println(libro);
+        }
+    }
+
+    public void buscarLibroPorTitulo() {
+        System.out.print("📂 Ingrese el nombre de la colección: ");
+        String nombreColeccion = scanner.nextLine();
+        System.out.print("🔍 Ingrese el título del libro: ");
+        String titulo = scanner.nextLine();
+
+        Libro libro = libroService.buscarLibroPorTitulo(nombreColeccion, titulo);
+        if (libro != null) {
+            System.out.println(libro);
+        }
+    }
+
+    public void buscarLibrosPorAutor() {
+        System.out.print("📂 Ingrese el nombre de la colección: ");
+        String nombreColeccion = scanner.nextLine();
+        System.out.print("🔍 Ingrese el nombre del autor: ");
+        String autor = scanner.nextLine();
+
+        List<Libro> libros = libroService.buscarLibrosPorAutor(nombreColeccion, autor);
+        if (!libros.isEmpty()) {
+            libros.forEach(System.out::println);
+        } else {
+            System.out.println("❌ No se encontraron libros de " + autor);
+        }
+    }
+
 
 }

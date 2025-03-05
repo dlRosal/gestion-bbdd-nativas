@@ -8,7 +8,7 @@ public class BaseXConnection {
     static {
         try {
             // Conectar al servidor BaseX en localhost, puerto 1984, usuario "admin", sin contraseña
-            session = new ClientSession("localhost", 1984, "admin", "admin");
+            session = new ClientSession("localhost", 9090, "admin", "admin");
             session.execute("OPEN Biblioteca"); // Abrir la base de datos
             System.out.println("✅ Conectado a la base de datos en BaseX Server.");
         } catch (Exception e) {

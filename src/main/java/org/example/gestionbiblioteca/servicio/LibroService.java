@@ -3,6 +3,15 @@ package org.example.gestionbiblioteca.servicio;
 import org.example.gestionbiblioteca.modelo.BaseXConnection;
 import org.example.gestionbiblioteca.modelo.Libro;
 import org.basex.api.client.ClientSession;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +50,120 @@ public class LibroService {
             e.printStackTrace();
         }
     }
+    public Libro buscarLibroPorId(String nombreColeccion, int id) {
+        try {
+            ClientSession session = BaseXConnection.getSession();
+            String xquery = "XQUERY collection('Biblioteca')//coleccion" +
+                    "[@nombre='" + nombreColeccion + "']/libro[@id='" + id + "']";
+            String resultado = session.execute(xquery);
+
+            if (resultado.isEmpty()) {
+                System.out.println("❌ No se encontró ningún libro con ID: " + id);
+                return null;
+            }
+
+            return procesarResultado(resultado);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public Libro buscarLibroPorTitulo(String nombreColeccion, String titulo) {
+        try {
+            ClientSession session = BaseXConnection.getSession();
+            String xquery = "XQUERY collection('Biblioteca')//coleccion" +
+                    "[@nombre='" + nombreColeccion + "']/libro[titulo='" + titulo + "']";
+            String resultado = session.execute(xquery);
+
+            if (resultado.isEmpty()) {
+                System.out.println("❌ No se encontró ningún libro con el título: " + titulo);
+                return null;
+            }
+
+            return procesarResultado(resultado);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public List<Libro> buscarLibrosPorAutor(String nombreColeccion, String autor) {
+        List<Libro> listaLibros = new ArrayList<>();
+        try {
+            ClientSession session = BaseXConnection.getSession();
+            String xquery = "XQUERY collection('Biblioteca')//coleccion" +
+                    "[@nombre='" + nombreColeccion + "']/libro[autor='" + autor + "']";
+            String resultado = session.execute(xquery);
+
+            if (resultado.isEmpty()) {
+                System.out.println("❌ No se encontraron libros del autor: " + autor);
+                return listaLibros;
+            }
+
+            return procesarResultadosMultiples(resultado);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return listaLibros;
+        }
+    }
+    private Libro procesarResultado(String resultado) {
+        try {
+            // Si el resultado está vacío, devolver null
+            if (resultado == null || resultado.trim().isEmpty()) {
+                return null;
+            }
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            InputSource inputSource = new InputSource(new StringReader(resultado));
+            Document document = builder.parse(inputSource);
+
+            // Obtenemos el nodo del libro
+            Node libroNode = document.getDocumentElement();
+
+            // Extraemos los datos del libro
+            String id = libroNode.getAttributes().getNamedItem("id").getNodeValue();
+            String titulo = ((Element) libroNode).getElementsByTagName("titulo").item(0).getTextContent();
+            String autor = ((Element) libroNode).getElementsByTagName("autor").item(0).getTextContent();
+            String genero = ((Element) libroNode).getElementsByTagName("genero").item(0).getTextContent();
+            int anio = Integer.parseInt(((Element) libroNode).getElementsByTagName("anio").item(0).getTextContent());
+
+            // Retornamos el objeto Libro
+            return new Libro(id, titulo, autor, genero, anio);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("❌ Error al procesar el resultado del libro.");
+            return null;
+        }
+    }
+
+    private List<Libro> procesarResultadosMultiples(String resultado) {
+        List<Libro> listaLibros = new ArrayList<>();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new InputSource(new StringReader("<libros>" + resultado + "</libros>")));
+            NodeList lista = doc.getElementsByTagName("libro");
+
+            for (int i = 0; i < lista.getLength(); i++) {
+                Node libroNode = lista.item(i);
+                if (libroNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element libroElement = (Element) libroNode;
+                    int id = Integer.parseInt(libroElement.getAttribute("id"));
+                    String titulo = libroElement.getElementsByTagName("titulo").item(0).getTextContent();
+                    String autor = libroElement.getElementsByTagName("autor").item(0).getTextContent();
+                    String genero = libroElement.getElementsByTagName("genero").item(0).getTextContent();
+                    int anio = Integer.parseInt(libroElement.getElementsByTagName("anio").item(0).getTextContent());
+
+                    listaLibros.add(new Libro(String.valueOf(id), titulo, autor, genero, anio));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listaLibros;
+    }
+
 
     public void agregarLibro(String nombreColeccion, String titulo, String autor, String genero, int anio) {
         try {
