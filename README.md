@@ -33,11 +33,15 @@ Este sistema permite **almacenar, consultar, modificar y eliminar libros** organ
 - BaseX instalado y en ejecución.
 - Un IDE como IntelliJ IDEA o Eclipse.
 
+- 
+## 📜 Licencia y derechos de autor
+© 2025 Álvaro del Rosal. Todos los derechos reservados.  
+Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
+
 ### **📌 Clonar el repositorio**
 ```sh
 git clone https://github.com/tu-usuario/nombre-del-repositorio.git
 cd nombre-del-repositorio
 
-## 📜 Licencia y derechos de autor
-© 2025 Álvaro del Rosal. Todos los derechos reservados.  
-Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
+
+
